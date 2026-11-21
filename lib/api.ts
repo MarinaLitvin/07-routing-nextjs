@@ -1,7 +1,7 @@
-import axios from "axios";
-import type { Note, NoteTag } from "../types/note";
+import axios from 'axios';
+import type { Note, NoteTag } from '../types/note';
 
-const API_URL = "https://notehub-public.goit.study/api";
+const API_URL = 'https://notehub-public.goit.study/api';
 
 const token = process.env.NEXT_PUBLIC_NOTEHUB_TOKEN;
 
@@ -17,6 +17,7 @@ export interface FetchNotesParams {
   page: number;
   perPage: number;
   search?: string;
+  tag?: NoteTag | 'all' | string;
 }
 
 // Response from GET /notes
@@ -37,12 +38,16 @@ export async function fetchNotes({
   page,
   perPage,
   search,
+  tag,
 }: FetchNotesParams): Promise<FetchNotesResponse> {
-  const { data } = await axiosInstance.get<FetchNotesResponse>("/notes", {
+  const normalizedTag = !tag || tag === 'all' ? undefined : tag;
+
+  const { data } = await axiosInstance.get<FetchNotesResponse>('/notes', {
     params: {
       page,
       perPage,
-      search,
+      ...(search ? { search } : {}),
+      ...(normalizedTag ? { tag: normalizedTag } : {}),
     },
   });
 
@@ -58,7 +63,7 @@ export async function fetchNoteById(id: string): Promise<Note> {
 
 // Create a note
 export async function createNote(noteData: CreateNoteData): Promise<Note> {
-  const { data } = await axiosInstance.post<Note>("/notes", noteData);
+  const { data } = await axiosInstance.post<Note>('/notes', noteData);
 
   return data;
 }

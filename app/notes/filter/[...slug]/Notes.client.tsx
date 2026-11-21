@@ -1,25 +1,29 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { useQuery, keepPreviousData } from "@tanstack/react-query";
-import { useDebouncedCallback } from "use-debounce";
+import { useEffect, useState } from 'react';
+import { useQuery, keepPreviousData } from '@tanstack/react-query';
+import { useDebouncedCallback } from 'use-debounce';
 
-import { fetchNotes } from "@/lib/api";
+import { fetchNotes } from '@/lib/api';
 
-import NoteList from "@/components/NoteList/NoteList";
-import Modal from "@/components/Modal/Modal";
-import NoteForm from "@/components/NoteForm/NoteForm";
-import Pagination from "@/components/Pagination/Pagination";
-import SearchBox from "@/components/SearchBox/SearchBox";
+import NoteList from '@/components/NoteList/NoteList';
+import Modal from '@/components/Modal/Modal';
+import NoteForm from '@/components/NoteForm/NoteForm';
+import Pagination from '@/components/Pagination/Pagination';
+import SearchBox from '@/components/SearchBox/SearchBox';
 
-import css from "@/components/NotesPage/NotesPage.module.css";
+import css from './NotesPage.module.css';
 
 const PER_PAGE = 12;
 
-export default function NotesClient() {
+type Props = {
+  tag?: string;
+};
+
+export default function NotesClient({ tag = 'all' }: Props) {
   const [page, setPage] = useState(1);
-  const [searchInput, setSearchInput] = useState("");
-  const [search, setSearch] = useState("");
+  const [searchInput, setSearchInput] = useState('');
+  const [search, setSearch] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const debouncedSearch = useDebouncedCallback((value: string) => {
@@ -27,13 +31,20 @@ export default function NotesClient() {
     setPage(1);
   }, 500);
 
+  useEffect(() => {
+    setPage(1);
+    setSearch('');
+    setSearchInput('');
+  }, [tag]);
+
   const { data, isLoading, isError } = useQuery({
-    queryKey: ["notes", page, search],
+    queryKey: ['notes', page, search, tag],
     queryFn: () =>
       fetchNotes({
         page,
         perPage: PER_PAGE,
         search,
+        tag,
       }),
     placeholderData: keepPreviousData,
   });
