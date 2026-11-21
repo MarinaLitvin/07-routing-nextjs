@@ -38,6 +38,7 @@ export default function NotePreviewClient({ id }: NotePreviewClientProps) {
           <h2>{note.title}</h2>
           <p>{note.content}</p>
           {note.tag && <span>{note.tag}</span>}
+          {note.createdAt && <p>Created: {note.createdAt}</p>}
           <button type="button" onClick={handleClose}>
             Close
           </button>
